@@ -3,8 +3,8 @@
     <b-nav tabs>
       <b-nav-item disabled><b>LC Quiz App</b></b-nav-item>
       <b-nav-item disabled
-        >Questions answered :
-        <b>{{ index + 1 }}/{{ numOfQuestions }}</b></b-nav-item
+        >Question :
+        <b>{{ index + 1 }} out of {{ numOfQuestions }}</b></b-nav-item
       >
     </b-nav>
   </div>

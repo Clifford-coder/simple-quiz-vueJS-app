@@ -1,36 +1,50 @@
 <template>
   <div>
     <h3 class="my-5" v-html="currentQuestion.question"></h3>
+    <h5 style="color: #3e3e3e">
+      Scores {{ numOfCorrect }} out of {{ numOfTotal }}
+    </h5>
     <p>Select one correct answer</p>
     <hr class="my-4" />
     <div class="my-4">
       <div v-for="answer in answers" :key="answer">
         <div
-          :class="[
-            answer === correctAns ? 'correct-ans' : 'answer',
-            answer === incorrectAns ? 'incorrect-ans' : 'answer',
-          ]"
+          :class="answerClass(answer)"
           @click.prevent="selectAns(answer)"
           v-html="answer"
         ></div>
       </div>
     </div>
     <div class="d-flex justify-content-between">
-      <b-button v-show="!(index === 0)" variant="primary" @click="previous"
-        >Previous</b-button
+      <b-button
+        variant="info"
+        :disabled="selectedAns === '' || answered"
+        @click="submitAns"
+        >Submit</b-button
       >
       <b-button
         variant="success"
-        v-if="!(index === numOfQuestions - 1)"
-        @click="next"
+        :disabled="index === numOfQuestions - 1"
+        @click="
+          () => {
+            next();
+            //reset
+            submitAns(selectedAns);
+            answered = false;
+            selectedAns = '';
+            correctAns = '';
+            incorrectAns = '';
+          }
+        "
         >Next</b-button
       >
-      <b-button variant="info" v-else @click="submitAns">Submit</b-button>
     </div>
   </div>
 </template>
 
 <script>
+import { shuffle } from "../utils";
+
 export default {
   name: "Question",
   props: {
@@ -39,18 +53,21 @@ export default {
     previous: Function,
     index: Number,
     numOfQuestions: Number,
-    submitAns: Function,
+    // submitAns: Function,
   },
   data() {
     return {
       selectedAns: "",
       correctAns: "",
       incorrectAns: "",
+      answered: false,
+      numOfTotal: 0,
+      numOfCorrect: 0,
     };
   },
   computed: {
     answers() {
-      const shuffledAnswers = this.shuffle([
+      const shuffledAnswers = shuffle([
         ...this.currentQuestion.incorrect_answers,
         this.currentQuestion.correct_answer,
       ]);
@@ -58,6 +75,25 @@ export default {
     },
   },
   methods: {
+    answerClass(answer) {
+      let className = "";
+
+      if (!this.answered && this.selectedAns === answer) {
+        className = "answer selected-ans";
+      } else if (this.answered && answer === this.correctAns) {
+        className = "answer correct-ans";
+      } else if (
+        this.answered &&
+        this.selectedAns === answer &&
+        answer === this.incorrectAns
+      ) {
+        className = "answer incorrect-ans";
+      } else {
+        className = "answer";
+      }
+
+      return className;
+    },
     selectAns(ans) {
       this.selectedAns = ans;
       if (this.selectedAns === this.currentQuestion.correct_answer) {
@@ -70,24 +106,12 @@ export default {
         this.correctAns = "";
       }
     },
-    shuffle(array) {
-      let currentIndex = array.length,
-        randomIndex;
-
-      // While there remain elements to shuffle...
-      while (0 !== currentIndex) {
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [array[currentIndex], array[randomIndex]] = [
-          array[randomIndex],
-          array[currentIndex],
-        ];
+    submitAns() {
+      if (this.selectedAns === this.currentQuestion.correct_answer) {
+        this.numOfCorrect++;
       }
-
-      return array;
+      this.numOfTotal++;
+      this.answered = true;
     },
   },
 };

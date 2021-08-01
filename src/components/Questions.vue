@@ -4,8 +4,6 @@
       <Question
         v-if="questions.length"
         :next="next"
-        :previous="previous"
-        :submitAns="submitAns"
         :index="index"
         :numOfQuestions="questions.length"
         :currentQuestion="questions[index]"

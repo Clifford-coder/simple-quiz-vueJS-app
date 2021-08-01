@@ -3,13 +3,7 @@
     <b-container>
       <b-row>
         <Header :index="index" :numOfQuestions="questions.length" />
-        <Questions
-          :next="next"
-          :submitAns="submitAns"
-          :previous="previous"
-          :questions="questions"
-          :index="index"
-        />
+        <Questions :next="next" :questions="questions" :index="index" />
       </b-row>
     </b-container>
   </div>
@@ -19,6 +13,8 @@
 import { v4 as uuidv4 } from "uuid";
 import Header from "./components/Header.vue";
 import Questions from "./components/Questions.vue";
+
+//TODO: Improve the user experience of the application
 
 export default {
   name: "App",
@@ -37,20 +33,8 @@ export default {
       if (this.index === this.questions.length - 1) return;
       this.index++;
     },
-    previous() {
-      if (this.index <= -1) return;
-      this.index--;
-    },
-    submitAns() {
-      //calcute the score for the user.
-      console.log("Submitted for scoring");
-    },
   },
   mounted: function () {
-    // const quesitions = await fetch("https://opentdb.com/api.php?amount=10", {
-    //   method: "GET",
-    // }).json();
-    // console.log(quesitions);
     fetch("https://opentdb.com/api.php?amount=10&type=multiple", {
       method: "GET",
     })
